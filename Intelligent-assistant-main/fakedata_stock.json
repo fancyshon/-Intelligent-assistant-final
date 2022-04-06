@@ -1,0 +1,50 @@
+[
+    {
+        "number": "2330",
+        "name": "台積電",
+        "high_price": "600",
+        "low_price": "580",
+        "start_price": "590",
+        "now_price": "585"
+    },
+    {
+        "number": "2454",
+        "name": "聯發科",
+        "high_price": "1000",
+        "low_price": "960",
+        "start_price": "970",
+        "now_price": "980"
+    },
+    {
+        "number": "0050",
+        "name": "元大台灣50",
+        "high_price": "136",
+        "low_price": "134",
+        "start_price": "134.5",
+        "now_price": "134.7"
+    },
+    {
+        "number": "2317",
+        "name": "鴻海",
+        "high_price": "107",
+        "low_price": "105",
+        "start_price": "106",
+        "now_price": "106.5"
+    },
+    {
+        "number": "2357",
+        "name": "華碩",
+        "high_price": "375",
+        "low_price": "370",
+        "start_price": "371",
+        "now_price": "371.5"
+    },
+    {
+        "number": "2603",
+        "name": "長榮",
+        "high_price": "140",
+        "low_price": "130",
+        "start_price": "133",
+        "now_price": "137"
+    }
+]
