@@ -7,6 +7,14 @@ name = "pypi"
 fastapi = "*"
 sqlalchemy = "*"
 uvicorn = "*"
+numpy = "*"
+pandas = "*"
+matplotlib = "*"
+mplfinance = "*"
+requests = "*"
+tensorflow = "*"
+sklearn = "*"
+finmind = "*"
 
 [dev-packages]
 
