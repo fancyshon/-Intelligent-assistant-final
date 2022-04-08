@@ -1,7 +1,6 @@
 import re
 from fastapi import APIRouter
 from database import SESSION
-from database import Stock, database_Stock, Favorite, database_Favorite
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
