@@ -15,6 +15,7 @@ requests = "*"
 tensorflow = "*"
 sklearn = "*"
 finmind = "*"
+beautifulsoup4 = "*"
 
 [dev-packages]
 
