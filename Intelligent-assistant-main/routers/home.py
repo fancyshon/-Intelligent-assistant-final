@@ -34,6 +34,12 @@ async def post_favorite(user: str, number: str):
         SESSION.refresh(new_favorite)
     return "successfully"
 
+@router.delete("/favorite")
+async def delete_favorite(user: str, number: str):
+    SESSION.query(database_Favorite).filter(database_Favorite.user == user, database_Favorite.number == number).delete()
+    SESSION.commit()
+    return "successfully"
+
 
 def get_stock_info(stock_number: str):
     data =  Stock(
