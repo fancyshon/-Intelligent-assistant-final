@@ -81,4 +81,5 @@ def get_stock_info(stock_number: str):
         price_data = soup.find('div', {'class': 'jsx-3874884103 jsx-306158562 block-value block-value-- block-value--small'}).text.split(" ")
         data.high_price = price_data[2]
         data.low_price = price_data[0]
+        data.price_increase = soup.find('div', {'class': 'jsx-2214436525 change-net'}).text
     return data
