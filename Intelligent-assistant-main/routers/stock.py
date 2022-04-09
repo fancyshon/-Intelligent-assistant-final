@@ -1,3 +1,4 @@
+from operator import index
 from fastapi import APIRouter
 from bs4 import BeautifulSoup 
 import urllib.request
@@ -59,27 +60,23 @@ def get_stock_info(stock_number: str):
         soup = BeautifulSoup(text_request,"html.parser")
         data.name = soup.find('h1', {'class': 'C($c-link-text) Fw(b) Fz(24px) Mend(8px)'}).text
         price_data = soup.find_all('span')
-        if price_data[68].text == "成交":
-            data.now_price = price_data[69].text
-            data.start_price = price_data[71].text
-            data.high_price = price_data[73].text
-            data.low_price = price_data[75].text
-            data.yesterday_price = price_data[81].text
-            data.price_increase = round(float(data.now_price) - float(data.yesterday_price), 2)
-        elif price_data[70].text == "成交":
-            data.now_price = price_data[71].text
-            data.start_price = price_data[73].text
-            data.high_price = price_data[75].text
-            data.low_price = price_data[77].text
-            data.yesterday_price = price_data[83].text
-            data.price_increase = round(float(data.now_price) - float(data.yesterday_price), 2)
+        for index, val in enumerate(price_data):
+            if val.text == "成交":
+                data.now_price = price_data[index+1].text
+                data.start_price = price_data[index+3].text
+                data.high_price = price_data[index+5].text
+                data.low_price = price_data[index+7].text
+                data.yesterday_price = price_data[index+13].text
+                data.price_increase = str(round(float(data.now_price) - float(data.yesterday_price), 2))
     else:
-        text_request = urllib.request.urlopen("https://invest.cnyes.com/index/TWS/TSE01")
+        text_request = urllib.request.urlopen("https://stockinfo.tw/")
         soup = BeautifulSoup(text_request,"html.parser")
         data.name = "台灣加權指數"
-        data.now_price = soup.find('div', {'class': 'jsx-2214436525 info-lp'}).text
-        price_data = soup.find('div', {'class': 'jsx-3874884103 jsx-306158562 block-value block-value-- block-value--small'}).text.split(" ")
-        data.high_price = price_data[2]
-        data.low_price = price_data[0]
-        data.price_increase = soup.find('div', {'class': 'jsx-2214436525 change-net'}).text
+        price_data = soup.find_all('p')
+        data.now_price = price_data[0].text
+        data.high_price = price_data[2].text
+        data.low_price = price_data[3].text
+        data.price_increase = price_data[4].text
+        data.start_price = price_data[1].text
+        data.yesterday_price = str(round(float(data.now_price) - float(data.price_increase), 2))
     return data
