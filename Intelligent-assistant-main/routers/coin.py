@@ -12,6 +12,34 @@ router = APIRouter()
 async def get_coin(name: str):
     return get_coin_info(name)
 
+@router.get("/favorite_coin")
+async def get_favorite_coin(user: str):
+    user_favorite_coin = SESSION.query(database_Favorite_coin).filter(database_Favorite_coin.user == user).all()
+    data = []
+    for favorite_list in user_favorite_coin:
+        data.append(get_coin_info(favorite_list.name))
+    return data
+
+@router.post("/favorite_coin")
+async def post_favorite_coin(user: str, name: str):
+    if SESSION.query(database_Favorite_coin).filter(database_Favorite_coin.user == user, database_Favorite_coin.name == name).first() is None:
+        new_favorite_coin = database_Favorite_coin(
+            **{
+                "name": name,
+                "user": user
+            }
+        )
+        SESSION.add(new_favorite_coin)
+        SESSION.commit()
+        SESSION.refresh(new_favorite_coin)
+    return "successfully"
+
+@router.delete("/favorite_coin")
+async def delete_favorite_coin(user: str, name: str):
+    SESSION.query(database_Favorite_coin).filter(database_Favorite_coin.user == user, database_Favorite_coin.name == name).delete()
+    SESSION.commit()
+    return "successfully"
+
 
 def get_coin_info(name: str):
     data =  Coin(
