@@ -21,19 +21,26 @@ def get_coin_info(name: str):
             "low_price": 0,
             "now_price": 0,
             "price_increase": 0,
+            "price_increase_rate": 0
         }
     )
     text_request = urllib.request.urlopen("https://crypto.cnyes.com/"+name+"/24h")
     soup = BeautifulSoup(text_request,"html.parser")
-    now_price = soup.find('span', {'class': 'jsx-143270965 big-num'}).text.split(",")
-    data.now_price = now_price[0] + now_price[1] + soup.find('span', {'class': 'jsx-143270965 small-num'}).text
+    data.now_price = soup.find('span', {'class': 'jsx-143270965 big-num'}).text + soup.find('span', {'class': 'jsx-143270965 small-num'}).text
     price_high_low = soup.find_all('div', {'class': 'jsx-3999696274 item-value'})
     data.high_price = price_high_low[0].text
-    data.low_price = price_high_low[0].text
+    data.low_price = price_high_low[1].text
     price_increase = soup.find('span', {'class': 'jsx-143270965 ch is-positive'})
     if price_increase is None:
         price_increase = soup.find('span', {'class': 'jsx-143270965 ch is-negative'})
         data.price_increase = "-" + price_increase.text
     else:
         data.price_increase = "+" + price_increase.text
+    # price increase rate
+    price_increase_rate = soup.find('span', {'class': 'jsx-143270965 chp is-positive'})
+    if price_increase_rate is None:
+        price_increase_rate = soup.find('span', {'class': 'jsx-143270965 chp is-negative'})
+        data.price_increase_rate = "-" + price_increase_rate.text
+    else:
+        data.price_increase_rate = "+" + price_increase_rate.text
     return data

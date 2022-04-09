@@ -53,3 +53,4 @@ class Coin(BaseModel):
     low_price: str
     now_price: str
     price_increase: str
+    price_increase_rate: str
