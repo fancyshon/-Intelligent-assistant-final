@@ -21,6 +21,11 @@ async def get_favorite(user: str):
         data.append(get_stock_info(favorite_list.number))
     return data
 
+@router.get("/recommend")
+async def get_recommend():
+    data = [get_stock_info("2330"),get_stock_info("2603"),get_stock_info("2454"),get_stock_info("3037"),get_stock_info("2609")]
+    return data
+
 @router.post("/favorite")
 async def post_favorite(user: str, number: str):
     if SESSION.query(database_Favorite).filter(database_Favorite.user == user, database_Favorite.number == number).first() is None:

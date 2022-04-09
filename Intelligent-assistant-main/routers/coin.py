@@ -20,6 +20,11 @@ async def get_favorite_coin(user: str):
         data.append(get_coin_info(favorite_list.name))
     return data
 
+@router.get("/recommend_coin")
+async def get_recommend_coin():
+    data = [get_coin_info("BTC"),get_coin_info("ETH"),get_coin_info("LUNA"),get_coin_info("SHIB"),get_coin_info("SOL")]
+    return data
+
 @router.post("/favorite_coin")
 async def post_favorite_coin(user: str, name: str):
     if SESSION.query(database_Favorite_coin).filter(database_Favorite_coin.user == user, database_Favorite_coin.name == name).first() is None:
