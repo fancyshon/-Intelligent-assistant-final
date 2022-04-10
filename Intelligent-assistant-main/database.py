@@ -1,3 +1,4 @@
+from unicodedata import name
 from pydantic import BaseModel
 
 from sqlalchemy import create_engine
@@ -25,6 +26,13 @@ class database_Favorite(Base):
     number = Column(String, nullable=False)
     user = Column(String, nullable=False)
 
+class database_Favorite_coin(Base):
+    __tablename__ = "favorite_coin"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    user = Column(String, nullable=False)
+
 Base.metadata.create_all(bind=engine)
 
 
@@ -32,9 +40,17 @@ Base.metadata.create_all(bind=engine)
 class Stock(BaseModel):
     number: str
     name: str
-    high_price: float
-    low_price: float
-    start_price: float
-    now_price: float
-    price_increase: float
-    yesterday_price: float
+    high_price: str
+    low_price: str
+    start_price: str
+    now_price: str
+    price_increase: str
+    yesterday_price: str
+
+class Coin(BaseModel):
+    name: str
+    high_price: str
+    low_price: str
+    now_price: str
+    price_increase: str
+    price_increase_rate: str

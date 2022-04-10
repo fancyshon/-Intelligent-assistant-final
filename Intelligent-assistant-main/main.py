@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from config import Config
 
-from routers import home, server, predict
+from routers import server, predict, stock, coin
 from routers import inter
 
 
@@ -16,7 +16,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(home.router)
+app.include_router(stock.router)
+app.include_router(coin.router)
 app.include_router(server.router)
 app.include_router(inter.router)
 app.include_router(predict.router)
