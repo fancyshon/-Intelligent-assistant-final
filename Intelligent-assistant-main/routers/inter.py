@@ -36,7 +36,7 @@ async def basic(id: int):
         response = requests.get(url,headers = headers)
         df = pd.read_csv(StringIO(response.text),index_col = "Date",parse_dates = ["Date"])
         df.index[::10]
-        address = "./routers/datasets/" + "2330" + ".csv" #自己改路徑
+        # address = "./routers/datasets/" + "2330" + ".csv" #自己改路徑
 
         df_kd_draw = df
         df_kd_draw['K'], df_kd_draw['D'] = talib.STOCH(df_kd_draw['High'], 
@@ -51,12 +51,11 @@ async def basic(id: int):
         mpf.make_addplot(df_kd_draw["D"],panel= 2,color="r")]
         mc = mpf.make_marketcolors(up='r', down='g', inherit=True)
         s  = mpf.make_mpf_style(base_mpf_style='yahoo', marketcolors=mc)
-        #address = r"C:\Users\Server\Desktop\dataset\\" + stock_id+"kd_ptr" + ".csv" #自己改路徑
-        #df_kd_draw.to_csv(address)
-        xmin = len(data_frame)*0.15
-        xmax = len(data_frame)
-        kwargs = dict(type='candle', mav=(5,10,20), volume = True,figsize=(12.5,12),style=s,addplot=add_plot,datetime_format='%Y-%m', xlim=(xmin,xmax) ,tight_layout=True)
+        # xmin = len(data_frame)*0.15
+        # xmax = len(data_frame)
+        # kwargs = dict(type='candle', mav=(5,10,20), volume = True,figsize=(12.5,12),style=s,addplot=add_plot,datetime_format='%Y-%m' ,tight_layout=True)
         address = "./routers/images/" + str(id) + "kd.jpg"
+        kwargs = dict(type='candle', mav=(5,10,20,60), volume = True,figsize=(20, 10),title = str(id)+" KD picture", style=s,addplot=add_plot)
         mpf.plot(df_kd_draw, **kwargs, savefig=address)
 
         # macd_draw
@@ -152,7 +151,6 @@ async def basic(id: int):
         plt.xlabel('Date')
         plt.ylabel('Price')
         plt.legend(loc='upper left')
-        # plt.show()
         address = "./routers/images/" + str(id) + "macdop.jpg" 
         plt.savefig(address)
 
@@ -185,7 +183,7 @@ async def basic(id: int):
         print("輸入錯誤格式，請重新輸入")
     
     CLIENT_ID = "b57c8df3844ca8d"
-    PATH = "./routers/images/"+str(id)+"kd.jpg"
+    PATH = "./routers/images/" + str(id) + "kd.jpg"
     uploadedImg = pyimgur.Imgur(CLIENT_ID).upload_image(PATH, title = 'fucjnfdio')
     return uploadedImg.link
 
