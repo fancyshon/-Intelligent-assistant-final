@@ -29,7 +29,7 @@ def Predict(Stock='2330'):
     # Get Data
     df = DataLoader().taiwan_stock_daily(
         stock_id=Stock,
-        start_date=dt.date.today() - dt.timedelta(days=(10)),
+        start_date=dt.date.today() - dt.timedelta(days=(20)),
         end_date=dt.date.today()
     )
     hist = df
@@ -40,7 +40,8 @@ def Predict(Stock='2330'):
     hist = hist.drop(['stock_id'], axis=1)
 
     hist = hist.sort_index()
-    print(hist.tail()['close'])
+    hist = hist.tail(6)
+    #print(hist.tail()['close'])
     # print(hist.info())
     time_stamp = hist.tail(1).index.item()
     time_stamp = dt.datetime.strptime(time_stamp, '%Y-%m-%d')
@@ -58,8 +59,8 @@ def Predict(Stock='2330'):
     checkpoint_path = './routers/Stock_model/' + Stock + '_model.hdf5'
     model_from_saved_checkpoint = load_model(checkpoint_path)
 
-    print('\n')
-    print('Predicting ' + Stock + ' price: ')
+    #print('\n')
+    #print('Predicting ' + Stock + ' price: ')
 
     # Predict
     testX_last_days = histX

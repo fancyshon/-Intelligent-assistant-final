@@ -38,7 +38,7 @@ def Predict(Crypto='BTC'):
     hist = hist.drop(['volumeto'], axis=1)
     hist.index = pd.to_datetime(hist.index, unit='s')
     hist = hist.sort_index()
-    print(hist.tail()['close'].to_string())
+    #print(hist.tail()['close'].to_string())
     time_stamp = hist.tail(1).index.item()
 
     old = hist.tail(1)['close'].values
@@ -54,8 +54,8 @@ def Predict(Crypto='BTC'):
     checkpoint_path = './routers/Crypto_model/' + Crypto + '_model.hdf5'
     model_from_saved_checkpoint = load_model(checkpoint_path)
 
-    print('\n')
-    print('Predicting ' + Crypto + ' price: ')
+    #print('\n')
+   # print('Predicting ' + Crypto + ' price: ')
 
     # Predict
     testX_last_days = histX
