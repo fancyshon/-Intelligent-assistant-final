@@ -67,8 +67,8 @@ async def log_in(user_id: str, user_pwd: str):
         pwd_in_db = c.fetchone()[0]
 
         if user_pwd == pwd_in_db:
-            c.close()
-            conn.close()
+            # c.close()
+            # conn.close()
             response['Registered']=True
             response['Successful']=True
         else:

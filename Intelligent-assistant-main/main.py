@@ -1,8 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from config import Config
-
-from routers import server, predict, stock, coin, coin_inter
+from routers import login, predict, stock, coin, coin_inter
 from routers import inter
 
 
@@ -18,7 +17,7 @@ app.add_middleware(
 
 app.include_router(stock.router)
 app.include_router(coin.router)
-app.include_router(server.router)
+app.include_router(login.router)
 app.include_router(inter.router)
 app.include_router(predict.router)
 app.include_router(coin_inter.router)

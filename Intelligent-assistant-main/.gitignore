@@ -2,3 +2,5 @@ database.db
 __pycache__/
 .csv
 UserData.db
+images/
+coin_image/
