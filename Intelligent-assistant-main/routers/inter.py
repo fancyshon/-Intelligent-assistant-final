@@ -15,6 +15,7 @@ from backtesting import Backtest, Strategy
 from backtesting.lib import crossover
 from backtesting.test import SMA, GOOG
 
+
 router = APIRouter()
 time_end = datetime.date.today()
 time_start = '2021-11-11'
@@ -53,7 +54,7 @@ async def basic(id: int):
         s  = mpf.make_mpf_style(base_mpf_style='yahoo', marketcolors=mc)
         xmin = len(df_kd_draw)*0.15
         xmax = len(df_kd_draw)
-        kwargs = dict(type='candle', mav=(5,10,20), volume = True,figsize=(12.5,12),datetime_format='%Y-%m %H:%M', style=s,addplot=add_plot, xlim=(xmin,xmax) ,tight_layout=True )
+        kwargs = dict(type='candle', mav=(5,10,20), volume = True,figsize=(12.5,12),datetime_format='%m-%d %H:%M', style=s,addplot=add_plot, xlim=(xmin,xmax) ,tight_layout=True )
         address = "./routers/images/" + str(id) + "kd.jpg"
         mpf.plot(df_kd_draw, **kwargs,savefig = address)
 
