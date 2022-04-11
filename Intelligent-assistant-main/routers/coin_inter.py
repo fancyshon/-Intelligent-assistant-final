@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from database import SESSION
 import numpy as np
 import pandas as pd
+import json
 import matplotlib.pyplot as plt
 import mplfinance as mpf
 import datetime as datetime
@@ -19,24 +20,31 @@ router = APIRouter()
 time_end = datetime.date.today()
 time_start = '2021-11-11'
 
-@router.get("/stock_inter")
-async def basic(id: int):
-    # 爬蟲
+@router.get("/coin_inter")
+async def basic_draw(Crypto: str):
     try:
-        days = 24 * 60 * 60    #一天有86400秒 
-        initial = datetime.datetime.strptime( '1970-01-01' , '%Y-%m-%d' )
-        start = datetime.datetime.strptime( str(time_start) , '%Y-%m-%d' )
-        end = datetime.datetime.strptime( str(time_end), '%Y-%m-%d' )
-        period1 = start - initial
-        period2 = end - initial
-        s1 = period1.days * days
-        s2 = period2.days * days
-        url ="https://query1.finance.yahoo.com/v7/finance/download/"+"2330"+".TW?period1="+str(s1)+"&period2="+str(s2)+"&interval=1d&events=history&includeAdjustedClose=true" 
-        headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.60 Safari/537.36"}
-        response = requests.get(url,headers = headers)
-        df = pd.read_csv(StringIO(response.text),index_col = "Date",parse_dates = ["Date"])
-        df.index[::10]
-        ## kd_draw
+        res = requests.get('https://min-api.cryptocompare.com/data/histohour?fsym=' + Crypto + '&tsym=USD&limit=72')
+        btc_input_df = pd.DataFrame(json.loads(res.content)['Data'])
+        stamp = btc_input_df['time'][0]
+        for i in range(0, 1):
+            res = requests.get('https://min-api.cryptocompare.com/data/histohour?fsym=' + Crypto + '&tsym=USD&limit=72' + '&toTs=' + str(stamp))
+            temp = pd.DataFrame(json.loads(res.content)['Data'])
+            stamp = temp['time'][0]
+        btc_input_df = btc_input_df.append(temp)
+        btc_input_df = btc_input_df.drop(['conversionType'], axis=1)
+        btc_input_df = btc_input_df.drop(['conversionSymbol'], axis=1)
+        btc_input_df = btc_input_df.drop(['volumefrom'], axis=1)
+        btc_input_df.columns = ['Date','High','Low','Open','Volume','Close']
+        btc_input_df = btc_input_df.set_index('Date')
+        btc_input_df = btc_input_df.sort_index()
+        btc_input_df.index = pd.to_datetime(btc_input_df.index, unit='s')
+        address = "./routers/datasets/" + Crypto + ".csv"
+        btc_input_df.to_csv(address)
+        df = pd.read_csv(address)
+        df.index = pd.DatetimeIndex(df['Date'])
+        df =df.drop(['Date'],axis = 1)
+
+        ## KD_draw
         df_kd_draw = df
         df_kd_draw['K'], df_kd_draw['D'] = talib.STOCH(df_kd_draw['High'], 
                                             df_kd_draw['Low'], 
@@ -48,16 +56,17 @@ async def basic(id: int):
                                             slowd_matype=1)
         add_plot =[mpf.make_addplot(df_kd_draw["K"],panel= 2,color="b"),
         mpf.make_addplot(df_kd_draw["D"],panel= 2,color="r")]
-
+    
         mc = mpf.make_marketcolors(up='r', down='g', inherit=True)
         s  = mpf.make_mpf_style(base_mpf_style='yahoo', marketcolors=mc)
+        address1 = "./routers/coin_image/" + Crypto + "kd.jpg"
+        #%m-%d %H:%M:%S
         xmin = len(df_kd_draw)*0.15
         xmax = len(df_kd_draw)
         kwargs = dict(type='candle', mav=(5,10,20), volume = True,figsize=(12.5,12),datetime_format='%m-%d %H:%M', style=s,addplot=add_plot, xlim=(xmin,xmax) ,tight_layout=True )
-        address = "./routers/images/" + str(id) + "kd.jpg"
-        mpf.plot(df_kd_draw, **kwargs,savefig = address)
+        mpf.plot(df_kd_draw, **kwargs,savefig = address1)
 
-        # macd_draw
+        ## macd
         data_frame = df
         ShortEMA=data_frame.Close.ewm(span=12,adjust=False).mean()
         LongEMA=data_frame.Close.ewm(span=26,adjust=False).mean()
@@ -71,13 +80,12 @@ async def basic(id: int):
         s  = mpf.make_mpf_style(base_mpf_style='yahoo', marketcolors=mc)
         xmin = len(data_frame)*0.15
         xmax = len(data_frame)
-        kwargs = dict(type='candle', mav=(5,10,20), volume = True,figsize=(12.5,12), style=s,addplot=add_plot,datetime_format='%Y-%m', xlim=(xmin,xmax) ,tight_layout=True)
-        address = "./routers/images/" + str(id) + "macd.jpg"
-        mpf.plot(data_frame, **kwargs, savefig=address)
+        kwargs = dict(type='candle', mav=(5,10,20), volume = True,figsize=(12.5,12), style=s,addplot=add_plot,datetime_format='%m-%d %H:%M', xlim=(xmin,xmax) ,tight_layout=True )
+        address = "./routers/coin_image/" + Crypto + "macd.jpg"
+        mpf.plot(data_frame, **kwargs , savefig=address)
 
-        ## kd_golden
+        ## golden
         df_kd_skill = df
-        df_kd_skill = df_kd_skill.loc[time_start:]
         np.any(pd.isnull(df_kd_skill))
         df_kd_skill['K'], df_kd_skill['D'] = talib.STOCH(df_kd_skill['High'], 
                                                 df_kd_skill['Low'], 
@@ -92,7 +100,6 @@ async def basic(id: int):
         df_kd_skill["B_K"] = df_kd_skill["K"].shift(1)
         df_kd_skill["B_D"] = df_kd_skill["D"].shift(1)
         df_kd_skill.tail()
-
         buy = []
         for i in range(len(df_kd_skill)):
             if df_kd_skill["B_K"][i] <  df_kd_skill["B_D"][i] and df_kd_skill["K"][i] > df_kd_skill["D"][i]:
@@ -116,7 +123,7 @@ async def basic(id: int):
             else:
                 buy_mark.append(np.nan)
         df_kd_skill["buy_mark"] = buy_mark
-
+        
         sell_mark = []
         for i in range(len(df_kd_skill)):
             if df_kd_skill["sell"][i] == -1:
@@ -131,11 +138,11 @@ async def basic(id: int):
                 mpf.make_addplot(df_kd_skill["sell_mark"],scatter=True, markersize=100, marker='^', color='g'),
                 mpf.make_addplot(df_kd_skill["K"],panel= 2,color="b"),
                 mpf.make_addplot(df_kd_skill["D"],panel= 2,color="r")]
-        xmin = len(data_frame)*0.15
-        xmax = len(data_frame)
-        kwargs = dict(type='candle', volume = True,figsize=(12.5,12),style=s,addplot=add_plot,datetime_format='%Y-%m', xlim=(xmin,xmax) ,tight_layout=True)
-        address = "./routers/images/" + str(id) + "golden.jpg" 
-        mpf.plot(df_kd_skill, **kwargs, savefig=address)
+        xmin = len(df_kd_skill)*0.15
+        xmax = len(df_kd_skill)
+        kwargs = dict(type='candle', volume = True,figsize=(12.5,12), style=s,addplot=add_plot,datetime_format='%m-%d %H:%M', xlim=(xmin,xmax) ,tight_layout=True )        
+        address = "./routers/coin_image/" + Crypto + "golden.jpg"
+        mpf.plot(df_kd_skill, **kwargs ,savefig=address)
 
         ## macd_op
         a=MACD_Buy_Sell(df)
@@ -145,28 +152,31 @@ async def basic(id: int):
         plt.scatter(df.index,df['Buy_Signal_Price'],color='red', label='Buy',marker='^',alpha=1)
         plt.scatter(df.index,df['Sell_Signal_Price'],color='green', label='Sell',marker='v',alpha=1)
         plt.plot(df['Close'], label='Close Price', alpha=0.35)
-        plt.title('MACD operation')
+        address = "./routers/coin_image/" + Crypto + "macdop.jpg"
         plt.xticks(rotation=45)
         plt.xlabel('Date')
         plt.ylabel('Price')
         plt.legend(loc='upper left')
-        address = "./routers/images/" + str(id) + "macdop.jpg" 
-        plt.savefig(address)
+        plt.savefig(address, bbox_inches="tight", pad_inches=0)
 
-        ##　boolean
+        ## boolean
         df_boolean_draw = df
         df_boolean_draw["upper"],df_boolean_draw["middle"],df_boolean_draw["lower"] = talib.BBANDS(df_boolean_draw["Close"], timeperiod=20, nbdevup=2.0, nbdevdn=2.0, matype=0)
 
         add_plot =[mpf.make_addplot(df_boolean_draw[['upper','lower']],linestyle='dashdot'),
                 mpf.make_addplot(df_boolean_draw['middle'],linestyle='dotted',color='y'),
+                mpf.make_addplot(df_boolean_draw["K"],panel= 2,color="b"),
+                mpf.make_addplot(df_boolean_draw["D"],panel= 2,color="r")
                 ]
         mc = mpf.make_marketcolors(up='r', down='g', inherit=True)
         s  = mpf.make_mpf_style(base_mpf_style='yahoo', marketcolors=mc)
-        kwargs = dict(type='candle', volume = True,figsize=(20, 10),title = str(id)+"boolean", style=s,addplot=add_plot)
-        address = "./routers/images/" + str(id) + "bool.jpg" 
-        mpf.plot(df_boolean_draw, **kwargs, savefig=address)
+        xmin = len(df_boolean_draw)*0.15
+        xmax = len(df_boolean_draw)
+        kwargs = dict(type='candle',  volume = True,figsize=(12.5,12), style=s,addplot=add_plot,datetime_format='%m-%d %H:%M', xlim=(xmin,xmax) ,tight_layout=True )
+        address = "./routers/coin_image/" + Crypto + "bool.jpg"
+        mpf.plot(df_boolean_draw, **kwargs ,savefig=address)
 
-        ## RSI 
+        ## RSI
         df['RSI6'] = talib.RSI(df['Close'],timeperiod = 6)
         df['RSI14'] = talib.RSI(df['Close'],timeperiod = 14)
         add_plot =[mpf.make_addplot(df["RSI6"],panel= 2,color="b"),
@@ -175,49 +185,49 @@ async def basic(id: int):
         s  = mpf.make_mpf_style(base_mpf_style='yahoo', marketcolors=mc)
         xmin = len(df)*0.15
         xmax = len(df)
-        kwargs = dict(type='candle', mav=(5,10,20), volume = True,figsize=(12.5,12), style=s,addplot=add_plot,datetime_format='%Y-%m', xlim=(xmin,xmax) ,tight_layout=True )
-        address = "./routers/images/" + str(id) + "rsi.jpg" 
+        kwargs = dict(type='candle', mav=(5,10,20), volume = True,figsize=(12.5,12), style=s,addplot=add_plot,datetime_format='%m-%d %H:%M', xlim=(xmin,xmax) ,tight_layout=True )
+        address = "./routers/coin_image/" + Crypto + "rsi.jpg"
         mpf.plot(df, **kwargs, savefig=address)
     except:
         print("輸入錯誤格式，請重新輸入")
     
-    CLIENT_ID = "b57c8df3844ca8d"
-    PATH = "./routers/images/" + str(id) + "kd.jpg"
+    CLIENT_ID = "d8da624901bac06"
+    PATH = "./routers/coin_image/" + Crypto + "kd.jpg"
     uploadedImg = pyimgur.Imgur(CLIENT_ID).upload_image(PATH, title = 'fucjnfdio')
     return uploadedImg.link
 
-@router.get("/golden")
-async def kd(id: int):
-    CLIENT_ID = "a95ed3d61682b97"
-    PATH = "./routers/images/"+str(id)+"golden.jpg"
+@router.get("/coin_macd")
+async def coin_macd(Crypto: str):
+    CLIENT_ID = "d8da624901bac06"
+    PATH = "./routers/coin_image/" + Crypto + "macd.jpg"
     uploadedImg = pyimgur.Imgur(CLIENT_ID).upload_image(PATH, title = 'fucjnfdio')
     return uploadedImg.link
 
-@router.get("/bool")
-async def bool(id: int):
-    CLIENT_ID = "b57c8df3844ca8d"
-    PATH = "./routers/images/"+str(id)+"bool.jpg"
+@router.get("/coin_golden")
+async def coin_golden(Crypto: str):
+    CLIENT_ID = "d8da624901bac06"
+    PATH = "./routers/coin_image/" + Crypto + "golden.jpg"
     uploadedImg = pyimgur.Imgur(CLIENT_ID).upload_image(PATH, title = 'fucjnfdio')
     return uploadedImg.link
 
-@router.get("/macd")
-async def macd(id: int):
-    CLIENT_ID = "b57c8df3844ca8d"
-    PATH = "./routers/images/"+str(id)+"macd.jpg"
+@router.get("/coin_macdop")
+async def coin_macdop(Crypto: str):
+    CLIENT_ID = "d8da624901bac06"
+    PATH = "./routers/coin_image/" + Crypto + "macdop.jpg"
     uploadedImg = pyimgur.Imgur(CLIENT_ID).upload_image(PATH, title = 'fucjnfdio')
     return uploadedImg.link
 
-@router.get("/macdop")
-async def macdop(id: int):
-    CLIENT_ID = "b57c8df3844ca8d"
-    PATH = "./routers/images/"+str(id)+"macdop.jpg"
+@router.get("/coin_bool")
+async def coin_bool(Crypto: str):
+    CLIENT_ID = "d8da624901bac06"
+    PATH = "./routers/coin_image/" + Crypto + "bool.jpg"
     uploadedImg = pyimgur.Imgur(CLIENT_ID).upload_image(PATH, title = 'fucjnfdio')
     return uploadedImg.link
 
-@router.get("/rsi")
-async def rsi(id: int):
-    CLIENT_ID = "b57c8df3844ca8d"
-    PATH = "./routers/images/"+str(id)+"rsi.jpg"
+@router.get("/coin_rsi")
+async def coin_rsi(Crypto: str):
+    CLIENT_ID = "d8da624901bac06"
+    PATH = "./routers/coin_image/" + Crypto + "rsi.jpg"
     uploadedImg = pyimgur.Imgur(CLIENT_ID).upload_image(PATH, title = 'fucjnfdio')
     return uploadedImg.link
 
