@@ -178,9 +178,9 @@ async def basic_draw(Crypto: str):
 
         ## RSI
         df['RSI6'] = talib.RSI(df['Close'],timeperiod = 6)
-        df['RSI14'] = talib.RSI(df['Close'],timeperiod = 14)
+        df['RSI12'] = talib.RSI(df['Close'],timeperiod = 12)
         add_plot =[mpf.make_addplot(df["RSI6"],panel= 2,color="b"),
-        mpf.make_addplot(df["RSI14"],panel= 2,color="r")]
+        mpf.make_addplot(df["RSI12"],panel= 2,color="r")]
         mc = mpf.make_marketcolors(up='r', down='g', inherit=True)
         s  = mpf.make_mpf_style(base_mpf_style='yahoo', marketcolors=mc)
         xmin = len(df)*0.15
