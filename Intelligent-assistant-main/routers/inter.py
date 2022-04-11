@@ -167,7 +167,7 @@ async def basic(id: int):
         kwargs = dict(type='candle', volume = True,figsize=(12.5, 12), style=s,addplot=add_plot,datetime_format='%Y-%m', tight_layout=True)
         address = "./routers/images/" + str(id) + "bool.jpg" 
         mpf.plot(df_boolean_draw, **kwargs, savefig=address)
-        
+
 
         ## RSI 
         df['RSI6'] = talib.RSI(df['Close'],timeperiod = 6)
