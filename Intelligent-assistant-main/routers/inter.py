@@ -15,6 +15,7 @@ from backtesting import Backtest, Strategy
 from backtesting.lib import crossover
 from backtesting.test import SMA, GOOG
 
+
 router = APIRouter()
 time_end = datetime.date.today()
 time_start = '2021-11-11'
