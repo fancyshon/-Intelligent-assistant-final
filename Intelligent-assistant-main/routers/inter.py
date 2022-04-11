@@ -55,7 +55,8 @@ async def basic(id: int):
         # xmax = len(data_frame)
         # kwargs = dict(type='candle', mav=(5,10,20), volume = True,figsize=(12.5,12),style=s,addplot=add_plot,datetime_format='%Y-%m' ,tight_layout=True)
         address = "./routers/images/" + str(id) + "kd.jpg"
-        kwargs = dict(type='candle', mav=(5,10,20,60), volume = True,figsize=(20, 10),title = str(id)+" KD picture", style=s,addplot=add_plot)
+        kwargs = dict(type='candle', mav=(5,10,20,60), volume = True,figsize=(16, 12), datetime_format='%Y-%m', style=s,addplot=add_plot, tight_layout=True)
+        
         mpf.plot(df_kd_draw, **kwargs, savefig=address)
 
         # macd_draw
@@ -72,7 +73,7 @@ async def basic(id: int):
         s  = mpf.make_mpf_style(base_mpf_style='yahoo', marketcolors=mc)
         xmin = len(data_frame)*0.15
         xmax = len(data_frame)
-        kwargs = dict(type='candle', mav=(5,10,20), volume = True,figsize=(12.5,12), style=s,addplot=add_plot,datetime_format='%Y-%m', xlim=(xmin,xmax) ,tight_layout=True)
+        kwargs = dict(type='candle', mav=(5,10,20), volume = True,figsize=(16,12), style=s,addplot=add_plot,datetime_format='%Y-%m', xlim=(xmin,xmax) ,tight_layout=True)
         address = "./routers/images/" + str(id) + "macd.jpg"
         mpf.plot(data_frame, **kwargs, savefig=address)
 
@@ -134,7 +135,7 @@ async def basic(id: int):
                 mpf.make_addplot(df_kd_skill["D"],panel= 2,color="r")]
         xmin = len(data_frame)*0.15
         xmax = len(data_frame)
-        kwargs = dict(type='candle', volume = True,figsize=(12.5,12),style=s,addplot=add_plot,datetime_format='%Y-%m', xlim=(xmin,xmax) ,tight_layout=True)
+        kwargs = dict(type='candle', volume = True,figsize=(16,12),style=s,addplot=add_plot,datetime_format='%Y-%m', xlim=(xmin,xmax) ,tight_layout=True)
         address = "./routers/images/" + str(id) + "golden.jpg" 
         mpf.plot(df_kd_skill, **kwargs, savefig=address)
 
@@ -163,7 +164,7 @@ async def basic(id: int):
                 ]
         mc = mpf.make_marketcolors(up='r', down='g', inherit=True)
         s  = mpf.make_mpf_style(base_mpf_style='yahoo', marketcolors=mc)
-        kwargs = dict(type='candle', volume = True,figsize=(20, 10),title = str(id)+"boolean", style=s,addplot=add_plot)
+        kwargs = dict(type='candle', volume = True,figsize=(12.5, 12), style=s,addplot=add_plot,datetime_format='%Y-%m', tight_layout=True)
         address = "./routers/images/" + str(id) + "bool.jpg" 
         mpf.plot(df_boolean_draw, **kwargs, savefig=address)
 
@@ -182,42 +183,48 @@ async def basic(id: int):
     except:
         print("輸入錯誤格式，請重新輸入")
     
-    CLIENT_ID = "b57c8df3844ca8d"
+     # CLIENT_ID = "b57c8df3844ca8d"
+    CLIENT_ID = "a3aa35fece8f6d3"
     PATH = "./routers/images/" + str(id) + "kd.jpg"
     uploadedImg = pyimgur.Imgur(CLIENT_ID).upload_image(PATH, title = 'fucjnfdio')
     return uploadedImg.link
 
 @router.get("/golden")
 async def kd(id: int):
-    CLIENT_ID = "b57c8df3844ca8d"
+    # CLIENT_ID = "b57c8df3844ca8d"
+    CLIENT_ID = "a3aa35fece8f6d3"
     PATH = "./routers/images/"+str(id)+"golden.jpg"
     uploadedImg = pyimgur.Imgur(CLIENT_ID).upload_image(PATH, title = 'fucjnfdio')
     return uploadedImg.link
 
 @router.get("/bool")
 async def bool(id: int):
-    CLIENT_ID = "b57c8df3844ca8d"
+    # CLIENT_ID = "b57c8df3844ca8d"
+    CLIENT_ID = "a3aa35fece8f6d3"
     PATH = "./routers/images/"+str(id)+"bool.jpg"
     uploadedImg = pyimgur.Imgur(CLIENT_ID).upload_image(PATH, title = 'fucjnfdio')
     return uploadedImg.link
 
 @router.get("/macd")
 async def macd(id: int):
-    CLIENT_ID = "b57c8df3844ca8d"
+     # CLIENT_ID = "b57c8df3844ca8d"
+    CLIENT_ID = "a3aa35fece8f6d3"
     PATH = "./routers/images/"+str(id)+"macd.jpg"
     uploadedImg = pyimgur.Imgur(CLIENT_ID).upload_image(PATH, title = 'fucjnfdio')
     return uploadedImg.link
 
 @router.get("/macdop")
 async def macdop(id: int):
-    CLIENT_ID = "b57c8df3844ca8d"
+     # CLIENT_ID = "b57c8df3844ca8d"
+    CLIENT_ID = "a3aa35fece8f6d3"
     PATH = "./routers/images/"+str(id)+"macdop.jpg"
     uploadedImg = pyimgur.Imgur(CLIENT_ID).upload_image(PATH, title = 'fucjnfdio')
     return uploadedImg.link
 
 @router.get("/rsi")
 async def macdop(id: int):
-    CLIENT_ID = "b57c8df3844ca8d"
+    # CLIENT_ID = "b57c8df3844ca8d"
+    CLIENT_ID = "a3aa35fece8f6d3"
     PATH = "./routers/images/"+str(id)+"rsi.jpg"
     uploadedImg = pyimgur.Imgur(CLIENT_ID).upload_image(PATH, title = 'fucjnfdio')
     return uploadedImg.link
